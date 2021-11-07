@@ -1,18 +1,44 @@
 <template>
   <div class="home">
-    <img alt="Vue logo" src="../assets/logo.png">
-    <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <form>
+      <label for="search">Search (recipe titles or ingredients):</label>
+      <input id="search" v-model="searchText"/>
+    </form>
+    <RecipeList :recipes="recipes"/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
-import HelloWorld from '@/components/HelloWorld.vue'
+import RecipeList from '@/components/RecipeList'
 
 export default {
   name: 'Home',
   components: {
-    HelloWorld
+    RecipeList
+  },
+  data() {
+    return {
+      searchText: ''
+    }
+  },
+  computed: {
+    recipes() {
+      return this.$root.$data.recipes.filter(recipe =>
+          recipe.title.toLowerCase().search(this.searchText.toLowerCase()) >= 0 ||
+          recipe.ingredients.find(section => section.sectionIngredients.toString().search(this.searchText.toLowerCase()) >= 0) !== undefined
+      );
+    }
   }
 }
 </script>
+
+<style scoped>
+.home {
+  margin-top: 50px;
+}
+
+#search {
+  margin-left: 15px;
+}
+</style>
