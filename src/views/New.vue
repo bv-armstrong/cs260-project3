@@ -7,6 +7,8 @@
       <input list="categories" v-model="category" placeholder="Category">
       <datalist id="categories">
         <option value="Breakfast" />
+        <option value="Main Dish" />
+        <option value="Dessert" />
         <option value="Other" />
       </datalist>
       <p></p>
