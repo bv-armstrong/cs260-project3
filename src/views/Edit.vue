@@ -1,29 +1,24 @@
 <template>
   <div class="container">
     <div class="wrapper">
-      <h1>{{ recipe.title }}</h1>
-      <p v-if="creator">Created by {{this.creator}}</p>
-      <form>
-        <button v-if="favorite" @click.prevent="toggleFavorite">Unmark as favorite</button>
-        <button v-else @click.prevent="toggleFavorite">Mark as favorite</button>
-      </form>
+      <h3>Title</h3>
+      <input v-model="recipe.title">
+      <p></p>
+      <h3>Category</h3>
+      <input v-model="recipe.category">
       <div class="recipe">
         <img class="recipe-image" :src="recipe.path"/>
         <div class="ingredients-list">
           <h3>Ingredients</h3>
-          <ul>
-            <li v-for="ingredient in recipe.ingredients" :key="ingredient">
-              {{ ingredient }}
-            </li>
-          </ul>
+          <textarea rows="5" v-model="ingredientsInput" placeholder="Input ingredients list, each ingredient on new line"/>
         </div>
       </div>
       <div class="steps">
-        <ol>
-          <li v-for="step in recipe.steps" :key="step">{{ step }}</li>
-        </ol>
+        <h3>Steps</h3>
+        <textarea rows="5" v-model="stepsInput" placeholder="Input steps, each on new line"/>
       </div>
-      <router-link :to="'/edit/recipe/'+recipe._id">Edit</router-link>
+      <button class="saveButton" @click.prevent="save">Save</button>
+      <button class="deleteButton" @click.prevent="deleteRecipe">Delete</button>
     </div>
   </div>
 </template>
@@ -36,41 +31,49 @@ export default {
   data() {
     return {
       recipe: {},
-      creator: "",
-      favorite: false
+      ingredientsInput: "",
+      stepsInput: ""
     }
   },
   async created() {
     this.getRecipe();
   },
   methods: {
-    setFavorite: async function () {
-      let currentUser = await axios.get('/api/users/' + this.$root.$data.user._id);
-      this.favorite = currentUser.data.favorites.indexOf(this.recipe._id) >= 0;
-    },
     async getRecipe() {
       try {
         let response = await axios.get("/api/recipes/" + this.$route.params.id);
         this.recipe = response.data;
-        if (this.recipe.createdBy) {
-          let creatorResponse = await axios.get('/api/users/' + this.recipe.createdBy);
-          this.creator = creatorResponse.data.name;
+        for (let ingredient of this.recipe.ingredients) {
+          this.ingredientsInput += ingredient + "\n";
         }
-        await this.setFavorite();
+        for (let step of this.recipe.steps) {
+          this.stepsInput += step + "\n";
+        }
         return true;
       } catch (error) {
         console.log(error);
       }
     },
-    async toggleFavorite() {
+    async save() {
       try {
-        this.favorite = !this.favorite;
-        await axios.put('/api/favorite', {
-          personId: this.$root.$data.user._id,
-          recipeId: this.recipe._id,
-          favorite: this.favorite
+        let ingredientsList = this.ingredientsInput.trim().split(/\r?\n/);
+        let stepsList = this.stepsInput.trim().split(/\r?\n/);
+        let r2 = await axios.put('/api/recipes/'+this.recipe._id, {
+          title: this.recipe.title,
+          category: this.recipe.category,
+          ingredients: ingredientsList,
+          steps: stepsList
         });
-        await this.setFavorite();
+        this.addItem = r2.data;
+        await this.$router.push('/recipe/'+this.recipe._id);
+      } catch (error) {
+        console.log(error);
+      }
+    },
+    async deleteRecipe() {
+      try {
+        await axios.delete('/api/recipes/'+this.recipe._id);
+        await this.$router.push('/');
       } catch (error) {
         console.log(error);
       }
@@ -153,4 +156,21 @@ form input {
   width: 25px;
   height: 25px;
 }
+
+.container {
+  margin-top: 50px;
+  margin-bottom: 50px;
+}
+
+textarea {
+  width: 100%;
+}
+
+button {
+  margin: 20px;
+  padding: 5px;
+  font-size: 20px;
+  border-radius: 5px;
+}
+
 </style>

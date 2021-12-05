@@ -4,11 +4,7 @@ import router from './router'
 
 Vue.config.productionTip = false
 
-import mock from './mock-data.js'
-
-let data = {
-  recipes: mock
-}
+let data = {}
 
 new Vue({
   router,

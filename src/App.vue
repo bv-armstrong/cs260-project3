@@ -1,16 +1,19 @@
 <template>
   <div id="app">
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
-      <a class="navbar-brand" href="/">BV-Armstrong Recipes</a>
+      <router-link v-if="this.$root.$data.user !== undefined" class="navbar-brand" to="/"><span class="nav-link">BV-Armstrong Recipes</span></router-link>
+      <router-link v-else class="navbar-brand" to="/login/"><span class="nav-link">BV-Armstrong Recipes</span></router-link>
+
       <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarSupportedContent"
               aria-controls="navbarSupportedContent" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
       </button>
 
-      <div class="collapse navbar-collapse" id="navbarSupportedContent">
+      <div v-if="this.$root.$data.user !== undefined" class="collapse navbar-collapse" id="navbarSupportedContent">
         <ul class="navbar-nav ml-auto">
           <router-link to="/"><span class="nav-link">Home</span></router-link>
           <router-link to="/favorites/"><span class="nav-link">Favorites</span></router-link>
+          <router-link to="/recipes/new/"><span class="nav-link">New Recipe</span></router-link>
         </ul>
 
       </div>
@@ -26,17 +29,36 @@
         <p>All photos used are under public domain.</p>
         <p class="p-long">GitHub Source Code:
           <a class="footer-link"
-             href=" https://github.com/bv-armstrong/cs260-project3">
-            https://github.com/bv-armstrong/cs260-project3
+             href=" https://github.com/bv-armstrong/cs260-recipes">
+            https://github.com/bv-armstrong/cs260-recipes
           </a>
         </p>
         <p class="p-short"><a class="footer-link"
-                              href=" https://github.com/bv-armstrong/cs260-project3">GitHub</a></p>
+                              href=" https://github.com/bv-armstrong/cs260-recipes">GitHub</a></p>
       </div>
     </div>
   </div>
-
 </template>
+
+<script>
+export default {
+  name: 'App',
+  created() {
+    if (this.$root.$data.user === undefined && this.$route.name !== "Login") {
+      try {
+        this.$router.push('/login/');
+      } catch (error) {
+        console.log("");
+      }
+    }
+  },
+  // computed: {
+  //   isLoggedIn() {
+  //     return this.$root.$data.user !== undefined;
+  //   }
+  // }
+}
+</script>
 
 <style>
 body {

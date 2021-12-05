@@ -4,13 +4,14 @@
       <label for="search">Search (recipe titles or ingredients):</label>
       <input id="search" v-model="searchText"/>
     </form>
-    <RecipeList :recipes="recipes"/>
+    <RecipeList :recipes="recipesFiltered"/>
   </div>
 </template>
 
 <script>
 // @ is an alias to /src
 import RecipeList from '@/components/RecipeList'
+import axios from 'axios';
 
 export default {
   name: 'Home',
@@ -19,15 +20,30 @@ export default {
   },
   data() {
     return {
-      searchText: ''
+      searchText: '',
+      recipes: []
     }
   },
+  created() {
+    this.getRecipes();
+  },
   computed: {
-    recipes() {
-      return this.$root.$data.recipes.filter(recipe =>
+    recipesFiltered() {
+      return this.recipes.filter(recipe =>
           recipe.title.toLowerCase().search(this.searchText.toLowerCase()) >= 0 ||
-          recipe.ingredients.find(section => section.sectionIngredients.toString().search(this.searchText.toLowerCase()) >= 0) !== undefined
+          recipe.ingredients.toString().search(this.searchText.toLowerCase()) >= 0
       );
+    }
+  },
+  methods: {
+    async getRecipes() {
+      try {
+        let response = await axios.get("/api/recipes");
+        this.recipes = response.data;
+        return true;
+      } catch (error) {
+        console.log(error);
+      }
     }
   }
 }

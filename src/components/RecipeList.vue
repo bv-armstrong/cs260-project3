@@ -1,9 +1,9 @@
 <template>
   <div class="wrapper">
     <div class="recipe-list">
-      <router-link v-for="recipe in recipes" :key="recipe.id" :to="'/recipe/'+recipe.id">
+      <router-link v-for="recipe in recipes" :key="recipe._id" :to="'/recipe/'+recipe._id">
         <div class="image-link-container">
-          <img :src="'/images/'+recipe.img">
+          <img :src="recipe.path">
           <h3 class="image-text">{{ recipe.title }}</h3>
         </div>
       </router-link>
